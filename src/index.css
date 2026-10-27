@@ -1,0 +1,769 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+
+  /* Modo oscuro — paleta original */
+  --color-dark-bg: #0F1012;
+  --color-dark-card: #212936;
+  --color-dark-muted: #323B49;
+  --color-dark-text-secondary: #9CA3AF;
+
+  /* Acento principal — azul petróleo (identidad del acueducto).
+     #12797B mantiene contraste ≥4.5:1 sobre blanco y ≈3.7:1 sobre el
+     fondo oscuro (el mismo comportamiento que tenía el azul anterior),
+     así `text-brand` y `bg-brand text-white` siguen siendo legibles en
+     ambos modos sin tocar los cientos de usos existentes. */
+  --color-brand: #12797B;
+  --color-brand-dark: #0D5F61;
+  --color-brand-light: #7FC8CB;
+
+  /* Modo claro — acento suministrado */
+  --color-agua: #8ECDE0;
+  --color-agua-dark: #5FB2CC;
+}
+
+/* ============================================================
+   Estados normalizados (etiquetas pequeñas con punto + texto)
+   Clases compartidas por todos los módulos: asociados, facturas,
+   recibos, multas, períodos y movimientos. El color nunca comunica
+   solo: cada badge lleva siempre el texto del estado y un punto que
+   refuerza la diferencia para personas con daltonismo.
+   ============================================================ */
+.badge-estado {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.15rem 0.55rem;
+  border-radius: 9999px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  line-height: 1.25;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+.badge-estado::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+/* Verde — actives / completados */
+.badge-verde {
+  background: #ECFDF5;
+  color: #047857;
+  border-color: #A7F3D0;
+}
+.dark .badge-verde {
+  background: rgba(6, 78, 59, 0.35);
+  color: #6EE7B7;
+  border-color: rgba(16, 185, 129, 0.35);
+}
+
+/* Ámbar — pendientes / suspendidos */
+.badge-ambar {
+  background: #FFFBEB;
+  color: #B45309;
+  border-color: #FDE68A;
+}
+.dark .badge-ambar {
+  background: rgba(120, 53, 15, 0.35);
+  color: #FCD34D;
+  border-color: rgba(245, 158, 11, 0.35);
+}
+
+/* Celeste — pagos parciales / reabiertos / en revisión */
+.badge-celeste {
+  background: #F0F9FF;
+  color: #0369A1;
+  border-color: #BAE6FD;
+}
+.dark .badge-celeste {
+  background: rgba(7, 89, 133, 0.35);
+  color: #7DD3FC;
+  border-color: rgba(14, 165, 233, 0.35);
+}
+
+/* Rojo — vencidos / errores */
+.badge-rojo {
+  background: #FEF2F2;
+  color: #B91C1C;
+  border-color: #FECACA;
+}
+.dark .badge-rojo {
+  background: rgba(127, 29, 29, 0.35);
+  color: #FCA5A5;
+  border-color: rgba(239, 68, 68, 0.35);
+}
+
+/* Gris — anulados / inactivos / cerrados */
+.badge-gris {
+  background: #F3F4F6;
+  color: #4B5563;
+  border-color: #D1D5DB;
+}
+.dark .badge-gris {
+  background: rgba(55, 65, 81, 0.55);
+  color: #9CA3AF;
+  border-color: rgba(107, 114, 128, 0.55);
+}
+
+/* Petróleo — períodos abiertos y etiquetas de contexto operativo */
+.badge-petroleo {
+  background: rgba(18, 121, 123, 0.1);
+  color: #0D5F61;
+  border-color: rgba(18, 121, 123, 0.35);
+}
+.dark .badge-petroleo {
+  background: rgba(127, 200, 203, 0.14);
+  color: #7FC8CB;
+  border-color: rgba(127, 200, 203, 0.4);
+}
+
+/* ============================================================
+   Tabla de datos compartida (.tabla-datos)
+   Escritorio: tabla clásica con encabezado y filas alineadas.
+   Celular (<768px): cada fila se convierte en tarjeta y cada celda
+   muestra su etiqueta a la izquierda (data-label), evitando el
+   desplazamiento horizontal de las tablas anchas.
+   ============================================================ */
+.tabla-datos {
+  --tbl-border: #E5E7EB;
+  --tbl-head-bg: #F9FAFB;
+  --tbl-label: #6B7280;
+  --tbl-hover: rgba(15, 23, 42, 0.025);
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+.dark .tabla-datos {
+  --tbl-border: #323B49;
+  --tbl-head-bg: rgba(50, 59, 73, 0.4);
+  --tbl-label: #9CA3AF;
+  --tbl-hover: rgba(255, 255, 255, 0.035);
+}
+.tabla-datos thead th {
+  text-align: left;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--tbl-label);
+  padding: 0.6rem 0.75rem;
+  background: var(--tbl-head-bg);
+  border-bottom: 1px solid var(--tbl-border);
+  white-space: nowrap;
+}
+.tabla-datos tbody td {
+  padding: 0.7rem 0.75rem;
+  border-bottom: 1px solid var(--tbl-border);
+  vertical-align: middle;
+}
+.tabla-datos tbody tr:last-child td {
+  border-bottom: none;
+}
+.tabla-datos tbody tr {
+  cursor: default;
+  transition: background-color 0.15s ease;
+}
+.tabla-datos tbody tr:hover {
+  background: var(--tbl-hover);
+}
+.tabla-datos tbody tr.fila-clic {
+  cursor: pointer;
+}
+.tabla-datos .col-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.tabla-datos thead th.col-num {
+  text-align: right;
+}
+
+@media (max-width: 767px) {
+  .tabla-datos thead {
+    display: none;
+  }
+  .tabla-datos,
+  .tabla-datos tbody,
+  .tabla-datos tr,
+  .tabla-datos td {
+    display: block;
+    width: 100%;
+  }
+  .tabla-datos tbody tr {
+    border: 1px solid var(--tbl-border);
+    border-radius: 12px;
+    margin-bottom: 0.625rem;
+    padding: 0.35rem 0;
+    background: var(--tbl-head-bg);
+    overflow: hidden;
+  }
+  .tabla-datos tbody td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    border-bottom: none;
+    padding: 0.35rem 0.85rem;
+    text-align: left;
+  }
+  .tabla-datos tbody td:not(:first-child) {
+    border-top: 1px dashed var(--tbl-border);
+  }
+  .tabla-datos tbody td::before {
+    content: attr(data-label);
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--tbl-label);
+    flex-shrink: 0;
+  }
+  .tabla-datos tbody td[data-label='']::before {
+    display: none;
+  }
+  .tabla-datos .col-num {
+    text-align: left;
+  }
+}
+
+/* Columna oculta solo en celular (importante: gana al display:block
+   de la media query por usar !important dentro del mismo rango). */
+@media (max-width: 767px) {
+  .tabla-datos .ocultar-movil {
+    display: none !important;
+  }
+}
+
+/* Foco visible para navegación por teclado en toda la app */
+:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* ============================================================
+   Sistema de modales "pantalla completa" en móvil
+   ============================================================
+   Problema que resuelve: en celular los modales se veían como
+   tarjetas flotantes centradas sobre el fondo, y cualquier bug de
+   scroll/z-index pendiente hacía que pareciera que "otra pantalla"
+   se mezclaba con la actual. La solución visual, independiente de
+   esos bugs, es que en móvil cada modal ocupe el 100% de la
+   pantalla: así nunca hay ambigüedad sobre qué se está viendo.
+
+   Cómo se usa: en el JSX del modal, se agrega la clase
+   `modal-shell` al contenedor `fixed inset-0` (el overlay) y
+   `modal-shell__card` a la tarjeta interna (el div con
+   rounded-2xl / max-w-*). En pantallas >= 640px (sm) el modal se
+   ve exactamente igual que antes: centrado, con bordes
+   redondeados y fondo oscurecido alrededor. Por debajo de 640px,
+   la tarjeta se estira a pantalla completa, sin bordes ni
+   márgenes, con scroll propio.
+   ============================================================ */
+@media (max-width: 639px) {
+  .modal-shell {
+    padding: 0 !important;
+    align-items: stretch !important;
+    /* Crítico: el overlay en sí NO debe poder hacer scroll ni
+       desplazarse como bloque. Antes cada modal traía su propia clase
+       Tailwind `overflow-y-auto` en este mismo contenedor (para que en
+       PC, si el modal es más alto que la pantalla, el usuario pueda
+       scrollear el conjunto completo). En móvil eso es justo lo que
+       causaba el bug reportado: al deslizar el dedo, el navegador
+       desplazaba TODO el overlay (tarjeta completa incluida) en vez de
+       solo el contenido interno, así que el header con el botón de
+       cerrar se salía de la pantalla por arriba y el usuario solo veía
+       el footer. Forzamos overflow:hidden aquí para que el overlay
+       quede clavado exactamente al viewport, y dejamos que sea
+       ÚNICAMENTE `.modal-shell__body` (ver abajo) el que scrollee. */
+    overflow: hidden !important;
+    position: fixed !important;
+    inset: 0 !important;
+    height: 100dvh !important;
+  }
+
+  .modal-shell__card {
+    width: 100% !important;
+    max-width: none !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    border-radius: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  /* La primera fila con título + botón cerrar (si existe) queda fija
+     arriba, y el resto del contenido hace scroll de forma independiente,
+     para que el usuario nunca tenga que "buscar" el modal con scroll de
+     la página completa. */
+  .modal-shell__card > .modal-shell__header {
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .modal-shell__card > .modal-shell__body {
+    flex: 1 1 auto;
+    /* min-height:0 es necesario: por defecto un hijo flex no puede
+       encogerse por debajo del tamaño de su contenido, así que sin esto
+       el body empuja la altura de la tarjeta en vez de scrollear
+       internamente (en algunas versiones de Chrome Android esto rompe
+       el overflow-y:auto de arriba). */
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+
+  .modal-shell__card > .modal-shell__footer {
+    flex-shrink: 0;
+    position: relative;
+  }
+}
+
+body {
+  font-family: var(--font-sans);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Oculta la barra de scroll en carruseles horizontales, sin quitar el scroll */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ===== Menú hamburguesa animado ===== */
+.burger {
+  display: inline-block;
+  cursor: pointer;
+  position: relative;
+  z-index: 60;
+  width: 30px;
+  height: 24px;
+}
+.burger span {
+  display: block;
+  width: 26px;
+  height: 2.5px;
+  border-radius: 2px;
+  background: #333;
+  margin: 6px 0;
+  transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55), opacity 0.3s ease;
+}
+.dark .burger span {
+  background: #f3f4f6;
+}
+.burger.is-open span:nth-child(1) {
+  transform: translateY(8.5px) rotate(45deg);
+}
+.burger.is-open span:nth-child(2) {
+  opacity: 0;
+  transform: translateX(-16px);
+}
+.burger.is-open span:nth-child(3) {
+  transform: translateY(-8.5px) rotate(-45deg);
+}
+
+/* ===== Módulo 11: Notificaciones ===== */
+@keyframes toastIn {
+  0% { transform: translateY(-12px) scale(0.95); opacity: 0; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+@keyframes modalPop {
+  0% { transform: scale(0.96); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes slideDown {
+  0% { opacity: 0; transform: translateY(-8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.ntf-item.ntf-alta .icon-container { color: #dc2626; }
+.dark .ntf-item.ntf-alta .icon-container { color: #f87171; }
+.ntf-item.ntf-media .icon-container { color: #b45309; }
+.dark .ntf-item.ntf-media .icon-container { color: #fbbf24; }
+.ntf-item.ntf-baja .icon-container { color: #15803d; }
+.dark .ntf-item.ntf-baja .icon-container { color: #4ade80; }
+
+/* ===== Notificaciones tipo "wave card" ===== */
+.ntf-item {
+  width: 100%;
+  min-height: 76px;
+  border-radius: 10px;
+  box-sizing: border-box;
+  padding: 10px 15px;
+  background-color: #ffffff;
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: background-color 0.3s, border 0.3s;
+}
+.dark .ntf-item {
+  background-color: var(--color-dark-card);
+  box-shadow: rgba(0, 0, 0, 0.45) 0px 8px 24px;
+}
+.ntf-item .wave {
+  position: absolute;
+  transform: rotate(90deg);
+  left: -31px;
+  top: 28px;
+  width: 80px;
+  pointer-events: none;
+}
+.ntf-item.ntf-info .wave { fill: #2563eb3a; }
+.ntf-item.ntf-info .icon-container { background-color: #2563eb26; color: #1d4ed8; }
+.dark .ntf-item.ntf-info .icon-container { color: #93c5fd; }
+
+.ntf-item.ntf-alta .wave { fill: #dc26263a; }
+.ntf-item.ntf-alta .icon-container { background-color: #dc262626; color: #dc2626; }
+
+.ntf-item.ntf-media .wave { fill: #d9770d3a; }
+.ntf-item.ntf-media .icon-container { background-color: #d9770d26; color: #b45309; }
+
+.ntf-item.ntf-baja .wave { fill: #15803d3a; }
+.ntf-item.ntf-baja .icon-container { background-color: #15803d26; color: #15803d; }
+
+.ntf-item.ntf-tesorero-pagos .wave { fill: #0596693a; }
+.ntf-item.ntf-tesorero-pagos .icon-container { background-color: #05966926; color: #059669; }
+.dark .ntf-item.ntf-tesorero-pagos .icon-container { color: #34d399; }
+
+.ntf-item.ntf-tesorero-suspendido .wave { fill: #dc26263a; }
+.ntf-item.ntf-tesorero-suspendido .icon-container { background-color: #dc262626; color: #dc2626; }
+.dark .ntf-item.ntf-tesorero-suspendido .icon-container { color: #f87171; }
+
+.icon-container {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ===== Tarjeta de encuesta destacada ===== */
+.survey-card {
+  background: linear-gradient(to right, #e0f2fe, #f0f9ff 55%, #ffffff);
+  border-left: 4px solid var(--color-brand);
+}
+.dark .survey-card {
+  background: linear-gradient(to right, #16233d, #16233d 55%, var(--color-dark-card));
+  border-left-color: var(--color-brand-light);
+}
+
+/* ===== FAB gooey (Galería / Publicaciones) ===== */
+.gooey-menu {
+  filter: url('#gooey-filter');
+}
+.gooey-fab-btn,
+.gooey-fab-item {
+  transition: transform 0.45s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* ===== Animación de la intro ===== */
+@keyframes expandLine {
+  0% { height: 0; opacity: 0; }
+  100% { height: 48px; opacity: 1; }
+}
+@keyframes revealLeft {
+  0% { opacity: 0; transform: scale(0.7) rotate(-10deg); filter: blur(5px); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); filter: blur(0); }
+}
+@keyframes floatLogo {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+@keyframes blinkCursor {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
+@keyframes blobFloat1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(40px, -40px) scale(1.15); }
+}
+@keyframes blobFloat2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-30px, 30px) scale(0.9); }
+}
+
+.intro-divider {
+  animation: expandLine 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
+  height: 0;
+}
+.intro-logo {
+  animation: revealLeft 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.5s forwards,
+             floatLogo 3s ease-in-out infinite 1.3s;
+  opacity: 0;
+}
+.intro-cursor {
+  animation: blinkCursor 0.9s infinite;
+}
+.animate-blob1 {
+  animation: blobFloat1 10s ease-in-out infinite;
+}
+.animate-blob2 {
+  animation: blobFloat2 12s ease-in-out infinite;
+}
+
+/* ===== Brillo suave del logo en la intro ===== */
+@keyframes logoGlowPulse {
+  0%, 100% { filter: drop-shadow(0 8px 16px rgba(37, 99, 235, 0.25)); }
+  50% { filter: drop-shadow(0 8px 26px rgba(37, 99, 235, 0.55)); }
+}
+.logo-glow {
+  animation: logoGlowPulse 2.6s ease-in-out infinite;
+}
+.dark .logo-glow {
+  animation-name: logoGlowPulseDark;
+}
+@keyframes logoGlowPulseDark {
+  0%, 100% { filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.5)); }
+  50% { filter: drop-shadow(0 8px 28px rgba(147, 197, 253, 0.45)); }
+}
+
+/* ===== Entrada de la app tras la intro (fade + subida suave) ===== */
+/* IMPORTANTE: el frame final usa `transform: none` (no `translateY(0)`).
+   Aunque visualmente sean iguales, `translateY(0)` sigue siendo un transform
+   "activo" para CSS, y cualquier elemento con transform activo se convierte
+   en el contenedor de referencia (containing block) de todos sus
+   descendientes con `position: fixed`. Como `.app-enter` envuelve TODA la
+   app (ver App.jsx) y la animación usa fill-mode `both` (deja el frame
+   final aplicado para siempre), con `translateY(0)` cada botón/modal
+   `fixed` de la app dejaba de posicionarse respecto a la pantalla y pasaba
+   a posicionarse respecto a este div, que mide lo mismo que toda la página.
+   Con `none` el navegador interpola igual durante la animación, pero al
+   terminar el transform queda realmente desactivado. */
+@keyframes appFadeIn {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: none; }
+}
+.app-enter {
+  animation: appFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* ===== Aparición escalonada de secciones del Home ===== */
+/* Mismo motivo que arriba: `none` en vez de `translateY(0)` en el frame
+   final, para no dejar un transform activo (y por lo tanto un containing
+   block accidental) en cada sección del Home una vez termina su animación. */
+@keyframes sectionReveal {
+  0% { opacity: 0; transform: translateY(22px); }
+  100% { opacity: 1; transform: none; }
+}
+.reveal-section {
+  opacity: 0;
+  animation: sectionReveal 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.reveal-1 { animation-delay: 0.05s; }
+.reveal-2 { animation-delay: 0.15s; }
+.reveal-3 { animation-delay: 0.25s; }
+.reveal-4 { animation-delay: 0.35s; }
+.reveal-5 { animation-delay: 0.45s; }
+
+/* Respeta la preferencia de "reducir movimiento" del sistema operativo de
+   forma UNIVERSAL: en vez de listar cada clase de animación una por una
+   (muchas se aplican como utilidades arbitrarias de Tailwind directo en
+   el JSX, ej. `animate-[modalPop_0.2s_ease]`, y no son practicas de
+   referenciar por nombre desde aquí), se reduce la duración de CUALQUIER
+   animación o transición de toda la página a casi cero. Esto es el
+   patrón estándar recomendado (usado también por Tailwind Preflight) y
+   cubre automáticamente animaciones presentes y futuras sin mantenimiento
+   manual de una lista.
+   Se usa `animation-duration: 0.01ms` en vez de `animation: none` a
+   propósito: con `none` el evento `animationend` nunca se dispara, y
+   `App.jsx`/`RevealSection.jsx` dependen de ese evento para quitar sus
+   clases de animación por completo una vez terminan (ver useLockBodyScroll
+   y RevealSection para más contexto). Con una duración casi nula, el
+   evento sigue disparándose, solo que de forma prácticamente instantánea. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ===== Secciones del menú de navegación ===== */
+.nav-section-title {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #9ca3af;
+  padding: 0 0.5rem;
+  margin-top: 1.1rem;
+  margin-bottom: 0.4rem;
+}
+.nav-section-title:first-child {
+  margin-top: 0;
+}
+.dark .nav-section-title {
+  color: #6b7280;
+}
+
+/* ===== Animación de error en formularios ===== */
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-8px); }
+  75% { transform: translateX(8px); }
+}
+
+/* ===== Reacciones de publicaciones: pulso del emoji + explosión al reaccionar ===== */
+@keyframes emojiPulse {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.45); }
+  65% { transform: scale(0.92); }
+  100% { transform: scale(1); }
+}
+.emoji-anim {
+  animation: emojiPulse 0.4s ease;
+}
+
+@keyframes emojiBurstPop {
+  0% { transform: translate(-50%, -50%) scale(0.4); opacity: 0; }
+  15% { opacity: 1; }
+  100% { transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(1.05); opacity: 0; }
+}
+.emoji-burst {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: visible;
+  z-index: 10;
+}
+.emoji-burst span {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  line-height: 1;
+  opacity: 0;
+  animation: emojiBurstPop 0.8s ease-out forwards;
+  will-change: transform, opacity;
+}
+.emoji-burst span:nth-child(1) { --tx: -34px; --ty: -42px; font-size: 12px; animation-delay: 0ms; }
+.emoji-burst span:nth-child(2) { --tx: -14px; --ty: -58px; font-size: 16px; animation-delay: 40ms; }
+.emoji-burst span:nth-child(3) { --tx: 8px;   --ty: -62px; font-size: 13px; animation-delay: 80ms; }
+.emoji-burst span:nth-child(4) { --tx: 28px;  --ty: -46px; font-size: 15px; animation-delay: 30ms; }
+.emoji-burst span:nth-child(5) { --tx: -4px;  --ty: -70px; font-size: 11px; animation-delay: 120ms; }
+.emoji-burst span:nth-child(6) { --tx: 18px;  --ty: -30px; font-size: 12px; animation-delay: 90ms; }
+
+/* ===== Contenido enriquecido de publicaciones (prose) ===== */
+.prose-content h1 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin: 1rem 0 0.5rem;
+}
+.prose-content h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0.875rem 0 0.5rem;
+}
+.prose-content p {
+  margin: 0.5rem 0;
+}
+.prose-content ul {
+  list-style: disc;
+  padding-left: 1.5rem;
+  margin: 0.5rem 0;
+}
+.prose-content ol {
+  list-style: decimal;
+  padding-left: 1.5rem;
+  margin: 0.5rem 0;
+}
+.prose-content a {
+  color: var(--color-brand);
+  text-decoration: underline;
+}
+.prose-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.75rem 0;
+  font-size: 0.875rem;
+}
+.prose-content th,
+.prose-content td {
+  border: 1px solid #cbd5e1;
+  padding: 8px;
+  text-align: left;
+}
+.dark .prose-content th,
+.dark .prose-content td {
+  border-color: #374151;
+}
+.prose-content img {
+  max-width: 100%;
+  border-radius: 12px;
+  margin: 0.5rem 0;
+}
+
+/* ===== Utilidades de recorte de texto ===== */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ===== Scroll mejorado para modales en móviles ===== */
+.overflow-y-auto {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Fix html5-qrcode scanner overlay covering bottom */
+.qr-scanner-container #qr-reader {
+  border: none !important;
+  padding: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+.qr-scanner-container #qr-reader video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  position: absolute !important;
+  inset: 0 !important;
+  transform: none !important;
+}
+.qr-scanner-container #qr-reader__scan_region {
+  position: absolute !important;
+  inset: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  height: 100% !important;
+}
+.qr-scanner-container #qr-reader__scan_region img {
+  display: none !important;
+}
+.qr-scanner-container #qr-reader__dashboard {
+  display: none !important;
+}
+.qr-scanner-container #qr-reader__header_message {
+  display: none !important;
+}
+
+/* Sileo viewport must appear above all modales */
+[data-sileo-viewport] {
+  z-index: 9999 !important;
+}

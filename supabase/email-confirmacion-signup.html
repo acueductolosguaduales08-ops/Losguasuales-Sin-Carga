@@ -1,0 +1,56 @@
+<!doctype html>
+<!--
+  PLANTILLA: Confirm signup — Acueducto Los Guaduales (español)
+  Cómo usarla:
+  1. Supabase Dashboard > Authentication > Email Templates > "Confirm signup".
+  2. Subject:  Acueducto Los Guaduales — confirma tu correo
+  3. Pega TODO el HTML de abajo en el cuerpo y guarda.
+  Variables disponibles: {{ .ConfirmationURL }} {{ .Email }} {{ .SiteURL }}
+-->
+<html lang="es">
+<body style="margin:0;padding:0;background:#f3f4f6;font-family:Arial,Helvetica,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f3f4f6;padding:32px 16px;">
+    <tr>
+      <td align="center">
+        <table width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border-radius:16px;overflow:hidden;">
+          <tr>
+            <td style="background:#0e7c3a;padding:24px 32px;text-align:center;">
+              <h1 style="margin:0;color:#ffffff;font-size:22px;">Acueducto Los Guaduales</h1>
+              <p style="margin:8px 0 0;color:#d7efe0;font-size:14px;">Confirma tu correo</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:32px;">
+              <p style="margin:0 0 16px;color:#111827;font-size:15px;">Hola,</p>
+              <p style="margin:0 0 16px;color:#374151;font-size:14px;line-height:1.6;">
+                Se creó una cuenta con este correo (<strong>{{ .Email }}</strong>) en la
+                plataforma del acueducto. Para activarla, confirma tu correo con el botón:
+              </p>
+              <p style="text-align:center;margin:28px 0;">
+                <a href="{{ .ConfirmationURL }}"
+                   style="display:inline-block;background:#0e7c3a;color:#ffffff;text-decoration:none;font-weight:bold;font-size:15px;padding:14px 32px;border-radius:12px;">
+                  Confirmar mi correo
+                </a>
+              </p>
+              <p style="margin:0 0 8px;color:#6b7280;font-size:13px;line-height:1.6;">
+                Si el botón no funciona, copia y pega este enlace en tu navegador:
+              </p>
+              <p style="margin:0 0 16px;color:#0e7c3a;font-size:12px;word-break:break-all;">
+                {{ .ConfirmationURL }}
+              </p>
+              <p style="margin:0;color:#9ca3af;font-size:12px;">
+                Si no pediste esta cuenta, ignora este mensaje.
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="background:#f9fafb;padding:16px 32px;text-align:center;">
+              <p style="margin:0;color:#9ca3af;font-size:12px;">Acueducto Los Guaduales · Sistema comunitario del agua</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
